@@ -1,81 +1,110 @@
 package tests;
 
 import com.microsoft.playwright.*;
-import org.testng.Reporter;
+import org.testng.ITestResult;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.AfterSuite;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.BeforeSuite;
 import utils.LoggerUtils;
+import utils.ReportUtils;
+import utils.runner.BrowserManager;
+import utils.runner.ConfigProperties;
 
-import static utils.TestData.BASE_URL;
+import java.lang.reflect.Method;
+
+import static utils.ProjectConstant.BASE_URL;
+import static utils.ProjectConstant.HOME_END_POINT;
 
 
 public abstract class BaseTest  {
     private final Playwright playwright = Playwright.create();
-    private final Browser browser = playwright.chromium().launch(new BrowserType.
-            LaunchOptions().setHeadless(false).setSlowMo(1500));
-    BrowserContext context = browser.newContext();
-    Page page = browser.newPage();
+    private final Browser browser = BrowserManager.createBrowser(playwright, ConfigProperties.ENVIRONMENT_CHROMIUM);
+    private BrowserContext context;
+    private Page page;
 
     @BeforeSuite
-    protected void beforeSuite() {
-//        System.setProperty("log4j2.debug", "true");
+    void checkIfPlaywrightCreatedAndBrowserLaunched() {
+        ReportUtils.logReportHeader();
+
         if (playwright != null) {
-            LoggerUtils.logInfo("Playwright created");
-            Reporter.log("-------Playwright is created");
+            LoggerUtils.logInfo("Playwright is created");
         } else {
-//            System.out.println("FATAL: Playwright is NOT created");
-            Reporter.log("FATAL: Playwright is NOT created");
+            LoggerUtils.logFatal("FATAL: Playwright is NOT created");
             System.exit(1);
         }
 
         if(browser.isConnected()) {
-            Reporter.log("Browser is created");
+            LoggerUtils.logInfo("Browser " + browser.browserType().name() + " is connected. \n");
         } else {
-            Reporter.log("FATAL: Browser is NOT created");
+            LoggerUtils.logFatal("FATAL: Browser is NOT connected");
             System.exit(1);
         }
     }
 
     @BeforeMethod
-    protected void beforeMethod() {
+    void createContextAndPage(Method method) {
+        ReportUtils.logTestName(method);
+
         context = browser.newContext();
-        Reporter.log("Context created");
+        LoggerUtils.logInfo("Context created");
 
         page = context.newPage();
-        Reporter.log("Page created");
+        LoggerUtils.logInfo("Page created");
+
+        LoggerUtils.logInfo("Start test");
 
         page.waitForTimeout(1000);
         page.navigate(BASE_URL);
+
+        if(isOnHomePage()) {
+            LoggerUtils.logInfo("Base url is opened and content is not empty.");
+        } else {
+            LoggerUtils.logInfo("ERROR: Base url is NOT opened OR content is EMPTY.");
+        }
     }
 
     @AfterMethod
-    protected void closeContext() {
+    void closeContext(ITestResult result, Method method) {
+        ReportUtils.logTestResult(method, result);
+
         if (page != null) {
             page.close();
-            Reporter.log("Page closed");
+            LoggerUtils.logInfo("Page closed");
         }
         if (context != null) {
             context.close();
-            Reporter.log("Context closed");
+            LoggerUtils.logInfo("Context closed\n");
         }
     }
 
     @AfterSuite
-    protected void closeBrowserAndPlaywright() {
+    void closeBrowserAndPlaywright() {
         if (browser != null) {
             browser.close();
-            Reporter.log("Browser closed");
+            LoggerUtils.logInfo("Browser closed");
         }
         if (playwright != null) {
             playwright.close();
-            Reporter.log("Playwright closed");
+            LoggerUtils.logInfo("Playwright closed"
+                    + ReportUtils.getLine());
         }
     }
 
     public Page getPage() {
+
         return page;
+    }
+
+    private boolean isOnHomePage() {
+        getPage().waitForLoadState();
+
+        return getPage().url().equals(BASE_URL + HOME_END_POINT) && !page.content().isEmpty();
+    }
+
+    protected boolean getIsOnHomePage() {
+
+        return isOnHomePage();
     }
 
     public void setTestId(String id) {
@@ -84,6 +113,7 @@ public abstract class BaseTest  {
 
     public Locator getId(String testId) {
         setTestId("id");
+
         return page.getByTestId(testId);
     }
 }

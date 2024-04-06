@@ -3,12 +3,12 @@ package tests;
 import com.microsoft.playwright.options.AriaRole;
 import org.testng.annotations.Test;
 import com.microsoft.playwright.*;
-import utils.TestData;
+import utils.ProjectConstant;
 
 import static com.microsoft.playwright.assertions.PlaywrightAssertions.assertThat;
-import static utils.TestData.BASE_URL;
-import static utils.TestData.HOME_END_POINT;
-import static utils.TestData.BASE_TITLE;
+import static utils.ProjectConstant.BASE_URL;
+import static utils.ProjectConstant.HOME_END_POINT;
+import static utils.ProjectConstant.BASE_TITLE;
 
 public class NavigationTest extends BaseTest {
     @Test
@@ -30,7 +30,7 @@ public class NavigationTest extends BaseTest {
                 .setName("Women".toLowerCase()).setExact(true)
         ).click();
 
-        assertThat(page).hasTitle(TestData.WOMEN_TITLE);
-        assertThat(page).hasURL(BASE_URL + TestData.WOMEN_END_POINT);
+        assertThat(page).hasTitle(ProjectConstant.WOMEN_TITLE);
+        assertThat(page).hasURL(BASE_URL + ProjectConstant.WOMEN_END_POINT);
     }
 }
