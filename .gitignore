@@ -1,12 +1,29 @@
+### Logs
+*.log
+debug.log
 target/
+logs/
+testTracing/
+videos/
+target/
+
+### Maven ###
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+
+config.properties
+log4j2.properties
+release.properties
+*.puml
 
 ### IntelliJ IDEA ###
-.idea/modules.xml
-.idea/jarRepositories.xml
-.idea/compiler.xml
+.idea/
+.idea/*
 .idea/libraries/
 *.iws
 *.iml
