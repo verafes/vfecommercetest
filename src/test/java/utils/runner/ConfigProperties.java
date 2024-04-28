@@ -20,7 +20,7 @@ public class ConfigProperties {
     private static Properties initProperties() {
         properties = new Properties();
         try {
-            FileInputStream file = new FileInputStream("src/test/resources/config.properties");
+            FileInputStream file = new FileInputStream("src/tests/resources/config.properties");
             properties.load(file);
         }  catch (IOException e) { //FileNotFoundException
             LoggerUtils.logError("ERROR: Properties file NOT found OR the file is empty OR the file is corrupted");

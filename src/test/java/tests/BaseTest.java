@@ -2,10 +2,7 @@ package tests;
 
 import com.microsoft.playwright.*;
 import org.testng.ITestResult;
-import org.testng.annotations.AfterMethod;
-import org.testng.annotations.AfterSuite;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.BeforeSuite;
+import org.testng.annotations.*;
 import utils.LoggerUtils;
 import utils.ReportUtils;
 import utils.runner.BrowserManager;
@@ -13,18 +10,18 @@ import utils.runner.ConfigProperties;
 
 import java.lang.reflect.Method;
 
-import static utils.ProjectConstant.BASE_URL;
-import static utils.ProjectConstant.HOME_END_POINT;
+import static utils.helpers.TestData.BASE_URL;
+import static utils.helpers.TestData.HOME_END_POINT;
 
 
 public abstract class BaseTest  {
     private final Playwright playwright = Playwright.create();
-    private final Browser browser = BrowserManager.createBrowser(playwright, ConfigProperties.ENVIRONMENT_CHROMIUM);
+    private Browser browser;
     private BrowserContext context;
     private Page page;
 
     @BeforeSuite
-    void checkIfPlaywrightCreatedAndBrowserLaunched() {
+    void checkIfPlaywrightCreated() {
         ReportUtils.logReportHeader();
 
         if (playwright != null) {
@@ -34,9 +31,21 @@ public abstract class BaseTest  {
             System.exit(1);
         }
 
+        LoggerUtils.logInfo(ReportUtils.printLine());
+    }
+
+     @BeforeClass
+     @Parameters({"browserOption", "isHeadless", "slowMo"})
+     void launchBrowser(String browserOption, String isHeadless, String slowMo) {
+        this.browser = BrowserManager.createBrowser(playwright, browserOption, isHeadless, slowMo);
+        // this.browser = BrowserManager.createBrowser(playwright, ConfigProperties.ENVIRONMENT_CHROMIUM);
+
         if(browser.isConnected()) {
-            LoggerUtils.logInfo("Browser " + browser.browserType().name() + " is connected. \n");
+            LoggerUtils.logInfo(ReportUtils.printLine());
+            LoggerUtils.logInfo("Browser " + browser.browserType().name() + " is connected. \n\n");
+            LoggerUtils.logInfo(ReportUtils.printLine());
         } else {
+            LoggerUtils.logInfo(ReportUtils.printLine());
             LoggerUtils.logFatal("FATAL: Browser is NOT connected");
             System.exit(1);
         }
@@ -52,7 +61,7 @@ public abstract class BaseTest  {
         page = context.newPage();
         LoggerUtils.logInfo("Page created");
 
-        LoggerUtils.logInfo("Start test");
+        LoggerUtils.logInfo("Start tests");
 
         page.waitForTimeout(1000);
         page.navigate(BASE_URL);
@@ -78,6 +87,18 @@ public abstract class BaseTest  {
         }
     }
 
+    @AfterClass
+    void closeBrowser(){
+        if (browser != null && browser.isConnected()) {
+            browser.close();
+            if(!browser.isConnected()) {
+                LoggerUtils.logInfo(ReportUtils.printLine());
+                LoggerUtils.logInfo("Browser " + browser.browserType().name() + " is closed");
+                LoggerUtils.logInfo(ReportUtils.printLine());
+            }
+        }
+    }
+
     @AfterSuite
     void closeBrowserAndPlaywright() {
         if (browser != null) {
@@ -87,7 +108,7 @@ public abstract class BaseTest  {
         if (playwright != null) {
             playwright.close();
             LoggerUtils.logInfo("Playwright closed"
-                    + ReportUtils.getLine());
+                    + ReportUtils.printLine());
         }
     }
 
