@@ -11,7 +11,7 @@ public class ReportUtils {
     private static final String LONG_TABS = "\t".repeat(10);
     private static final String SHORT_TABS = "\t".repeat(8);
 
-    public static String getLine() {
+    public static String printLine() {
 
         return LINE;
     }
@@ -40,7 +40,7 @@ public class ReportUtils {
     }
 
     public static void logTestName(Method method) {
-        LoggerUtils.logInfo(getLine());
+        LoggerUtils.logInfo(printLine());
         String testInfo = """
         Run: %s""".formatted(getTestName(method));
 
@@ -80,7 +80,7 @@ public class ReportUtils {
                         getTestName(method) + String.format("%" + (70 - getTestName(method).length()) + "s", " "),
                         getTestResult(result),
                         ReportUtils.getTestRunTime(result),
-                        getLine()
+                        printLine()
                 )
         );
     }

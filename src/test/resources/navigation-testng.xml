@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+<suite name="ECommerce Website Tests" parallel="tests" thread-count="4" verbose="2">
+    <test name="Playwright Tests with Chromium Browser" enabled="true">
+        <classes>
+            <class name="tests.NavigationTest">
+                <parameter name="browserOption" value="chromium"/>
+                <parameter name="isHeadless" value="false"/>
+                <parameter name="slowMo" value="1500"/>
+                <methods>
+                    <include name="testBaseUrlLanding"/>
+                    <include name="testHomePageURLAndTitleAsExpected"/>
+                    <include name="testMenuNavigatesToCorrespondingPage"/>
+                </methods>
+            </class>
+        </classes>
+    </test> <!-- Test -->
+    <test name="Playwright Tests with Firefox Browser" enabled="true">
+        <classes>
+            <class name="tests.NavigationTest">
+                <parameter name="browserOption" value="firefox"/>
+                <parameter name="isHeadless" value="false"/>
+                <parameter name="slowMo" value="1500"/>
+                <methods>
+                    <include name="testBaseUrlLanding"/>
+                    <include name="testMenuNavigatesToCorrespondingPage"/>
+                </methods>
+            </class>
+        </classes>
+    </test> <!-- Test -->
+    <test name="Playwright Tests with Webkit" enabled="true">
+        <classes>
+            <class name="tests.NavigationTest">
+                <parameter name="browserOption" value="webkit"/>
+                <parameter name="isHeadless" value="false"/>
+                <parameter name="slowMo" value="1500"/>
+                <methods>
+                    <include name="testBaseUrlLanding"/>
+                </methods>
+            </class>
+        </classes>
+    </test> <!-- Test -->
+</suite> <!-- Suite -->
